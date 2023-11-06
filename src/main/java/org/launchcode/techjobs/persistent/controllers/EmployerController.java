@@ -18,7 +18,13 @@ public class EmployerController {
     @Autowired
     private EmployerRepository employerRepository;
 
+    @GetMapping("/")
+    public String index(Model model){
+       model.addAttribute("title", "All Employers");
+        model.addAttribute("employers",employerRepository.findAll());
 
+        return "employers/index";
+    }
 
     @GetMapping("add")
     public String displayAddEmployerForm(Model model) {
@@ -31,13 +37,12 @@ public class EmployerController {
                                     Errors errors, Model model) {
 
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Create Employer");
             return "employers/add";
         }
         employerRepository.save(newEmployer);
-        model.addAttribute("title",employerRepository.findAll());
+        model.addAttribute("employers",employerRepository.findAll());
 
-        return "/index";
+        return "redirect:";
     }
 
     @GetMapping("view/{employerId}")
@@ -53,11 +58,6 @@ public class EmployerController {
         }
 
     }
-    @GetMapping("/")
-    public String index(Model model){
-        model.addAttribute("title", "All Employers");
-        model.addAttribute("employers",employerRepository.findAll());
-        return "employers/index";
-    }
+
 
 }
