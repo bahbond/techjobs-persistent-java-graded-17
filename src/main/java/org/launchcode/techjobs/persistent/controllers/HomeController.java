@@ -35,33 +35,34 @@ public class HomeController {
     @RequestMapping("/")
     public String index(Model model) {
 
-        model.addAttribute("title", "MyJobs");
+       model.addAttribute("title", "MyJobs");
+        model.addAttribute("jobs", jobRepository.findAll());
         return "index";
     }
 
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
-	model.addAttribute("title", "Add Job");
+        model.addAttribute("title", "Add Job");
         model.addAttribute("employers", employerRepository.findAll());
         model.addAttribute("skills", skillRepository.findAll());
-      model.addAttribute(new Job());
+        model.addAttribute(new Job());
         return "add";
     }
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
+                                    Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
         if (errors.hasErrors()) {
-	    model.addAttribute("title", "Add Job");
+            model.addAttribute("title", "Add Job");
             return "add";
         }
         Optional<Employer> result = employerRepository.findById(employerId);
         if (result.isPresent()) {
             Employer employer = result.get();
             newJob.setEmployer(employer);
-          }
-         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+        }
+        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         newJob.setSkills(skillObjs);
         jobRepository.save(newJob);
         return "redirect:";
@@ -69,9 +70,17 @@ public class HomeController {
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
-    model.addAttribute("jobs", jobRepository.findById(jobId));
-    model.addAttribute("skills", skillRepository.findAll());
+
+        Optional<Job> resultlJob = jobRepository.findById(jobId);
+        if (resultlJob.isPresent()) {
+            Job job = resultlJob.get();
+            model.addAttribute("job", job);
             return "view";
+        } else {
+            return "redirect:";
+        }
     }
 
 }
+
+
